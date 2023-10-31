@@ -3,8 +3,9 @@ Contact Info
 
 Group Members & Email Addresses:
 
-    Person 1, person1@uky.edu
-    Person 2, person2@uky.edu
+    Braden Howell, brho231@uky.edu
+    Ethan Binkley, rebi227@uky.edu
+    Jaden Vaught, jva231@uky.edu
 
 Versioning
 ==========
@@ -13,7 +14,7 @@ Github Link:
 
 General Info
 ============
-This file describes how to install/run your program and anything else you think the user should know
+Needs to be added
 
 Install Instructions
 ====================
