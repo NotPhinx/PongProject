@@ -14,4 +14,10 @@ import threading
 # You will need to keep track of where on the screen (x,y coordinates) each paddle is, the score 
 # for each player and where the ball is, and relay that to each client
 # I suggest you use the sync variable in pongClient.py to determine how out of sync your two
-# clients are and take actions to resync the games
+# clients are and take actions to resync the game
+
+# initialize server and its information
+# connect to various hosts to specific port
+# begin threads to handle separate communication from server to each client
+
+# need to decide if threads should be created and joined before or after getting info from client
