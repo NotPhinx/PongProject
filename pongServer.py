@@ -21,3 +21,47 @@ import threading
 # begin threads to handle separate communication from server to each client
 
 # need to decide if threads should be created and joined before or after getting info from client
+
+# add ip address of local machine that will host server
+server = ""
+port = 5555
+
+# socket for connection to server
+sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+
+try: 
+    sock.bind((server, port))
+except socket.error as e:
+    str(e)
+
+sock.listen(2)
+print("Server launched successfully, waiting for connection")
+
+def threadClient(conn):
+    reply = ""
+    while True:
+        try:
+            data = conn.recv(2048)
+            reply = data.decode("utf-8")
+
+            if not data:
+                print("Disconnected")
+                break
+            else:
+                print("Received:", reply)
+                print("Sending:", reply)
+
+            conn.sendall(str.encode(reply))
+        except:
+            break
+
+    print("Loss connection")
+    conn.close()
+
+
+while True:
+    conn, addr = sock.accept()
+    print("Connected to:", addr)
+
+    thread = threading.Thread(target=threadClient, args=(conn,))
