@@ -169,14 +169,14 @@ def playGame(screenWidth:int, screenHeight:int, playerPaddle:str, client:socket.
         # =========================================================================================
         # Send your server update here at the end of the game loop to sync your game with your
         # opponent's game
-        if(sync > data.sync){
+        if(sync > data.sync):
             #sync the sync variable to data.sync
             sync = data.sync
-        }
-        else{
+        
+        else:
             #sync the data.sync to sync variable
             data.sync = sync
-        }
+        
         # =========================================================================================
 
 
