@@ -82,23 +82,7 @@ def playGame(screenWidth:int, screenHeight:int, playerPaddle:str, client:socket.
         # Your code here to send an update to the server on your paddle's information,
         # where the ball is and the current score.
         # Feel free to change when the score is updated to suit your needs/requirements
-
-        while True:
-             # Create dictionary with paddle, ball, and score information
-            game_info = {
-                "player_paddle": playerPaddleObj.rect.__dict__,
-                "opponent_paddle": opponentPaddleObj.rect.__dict__,
-                "ball": ball.rect.__dict__,
-                "score": (lScore, rScore)
-            }
-
-            # Convert dictionary to string
-            game_info_str = str(game_info)
-
-            # Send string to server
-            client.send(game_info_str.encode())
-
-    
+        
         
         # =========================================================================================
 
@@ -170,12 +154,7 @@ def playGame(screenWidth:int, screenHeight:int, playerPaddle:str, client:socket.
         # =========================================================================================
         # Send your server update here at the end of the game loop to sync your game with your
         # opponent's game
-        if(sync > data.sync){
-            sync = data.sync;
-        }
-        else{
-            data.sync = sync;
-        }
+
         # =========================================================================================
 
 
@@ -198,9 +177,6 @@ def joinServer(ip:str, port:str, errorLabel:tk.Label, app:tk.Tk) -> None:
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     # Get the required information from your server (screen width, height & player paddle, "left or "right)
-    screenWidth = 640
-    screenHeight = 480
-    playerPaddle = "left"
 
 
     # If you have messages you'd like to show the user use the errorLabel widget like so
@@ -230,7 +206,7 @@ def startScreen():
     ipEntry = tk.Entry(app)
     ipEntry.grid(column=1, row=1)
 
-    portLabel = tk.Label(text="Server Port:") #server port is 5555
+    portLabel = tk.Label(text="Server Port:")
     portLabel.grid(column=0, row=2, sticky="W", padx=8)
 
     portEntry = tk.Entry(app)
