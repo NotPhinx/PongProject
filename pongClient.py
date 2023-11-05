@@ -83,21 +83,19 @@ def playGame(screenWidth:int, screenHeight:int, playerPaddle:str, client:socket.
         # where the ball is and the current score.
         # Feel free to change when the score is updated to suit your needs/requirements
 
-        while True:
+        # Create a dictionary with the relevant information
+        itemdata = {
+            "player_paddle": playerPaddleObj.rect.__dict__,
+            "opponent_paddle": opponentPaddleObj.rect.__dict__,
+            "ball": ball.rect.__dict__,
+            "score": (lScore, rScore)
+        }
 
-            # Create a dictionary with the relevant information
-            itemdata = {
-                "player_paddle": playerPaddleObj.rect.__dict__,
-                "opponent_paddle": opponentPaddleObj.rect.__dict__,
-                "ball": ball.rect.__dict__,
-                "score": (lScore, rScore)
-            }
+        # Convert the dictionary to a string
+        objectdata = str(itemdata)
 
-            # Convert the dictionary to a string
-            objectdata = str(itemdata)
-
-            # Send the string to the server
-            client.send(objectdata.encode())
+        # Send the string to the server
+        client.send(objectdata.encode())
 
         # =========================================================================================
 
@@ -169,13 +167,12 @@ def playGame(screenWidth:int, screenHeight:int, playerPaddle:str, client:socket.
         # =========================================================================================
         # Send your server update here at the end of the game loop to sync your game with your
         # opponent's game
-        if(sync > data.sync):
-            #sync the sync variable to data.sync
-            sync = data.sync
-        
-        else:
-            #sync the data.sync to sync variable
-            data.sync = sync
+        # if(sync > data.sync):
+        #     #sync the sync variable to data.sync
+        #     sync = data.sync
+        # else:
+        #     #sync the data.sync to sync variable
+        #     data.sync = sync
         
         # =========================================================================================
 
