@@ -8,6 +8,7 @@
 
 import socket
 import threading
+import json
 
 # Use this file to write your server logic
 # You will need to support at least two clients
@@ -38,30 +39,50 @@ except socket.error as e:
 sock.listen(2)
 print("Server launched successfully, waiting for connection")
 
-def threadClient(conn):
+player0_objData = {
+    "player_paddle": "",
+    "ball": "",
+    "score": (0, 0),
+    "sync": 0
+}
+player1_objData = {
+    "player_paddle": "",
+    "ball": "",
+    "score": (0, 0),
+    "sync": 0
+}
+
+def threadClient(conn:socket.socket, player:int) -> None:
     reply = ""
     while True:
         try:
-            data = conn.recv(2048)
-            reply = data.decode("utf-8")
+            data = conn.recv(2048).decode("utf-8")
+            data = json.loads(data)
 
             if not data:
                 print("Disconnected")
                 break
             else:
-                print("Received:", reply)
-                print("Sending:", reply)
+                if player == 0 and player1_objData["sync"] > 0:
+                    for key in data:
+                        player0_objData[key] = data[key]
+                    reply = str(player1_objData)
+                elif player == 1 and player0_objData["sync"] > 0:
+                    for key in data:
+                        player1_objData[key] = data[key]
+                    reply = str(player0_objData)
 
-            conn.sendall(str.encode(reply))
+            conn.send(str.encode(reply))
         except:
             break
 
     print("Loss connection")
     conn.close()
 
-
+currentPlayer = 0
 while True:
     conn, addr = sock.accept()
     print("Connected to:", addr)
 
-    thread = threading.Thread(target=threadClient, args=(conn,))
+    thread = threading.Thread(target=threadClient, args=(conn, currentPlayer))
+    currentPlayer += 1
