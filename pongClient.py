@@ -10,6 +10,7 @@ import pygame
 import tkinter as tk
 import sys
 import socket
+import pickle
 
 from assets.code.helperCode import *
 
@@ -82,8 +83,18 @@ def playGame(screenWidth:int, screenHeight:int, playerPaddle:str, client:socket.
         # Your code here to send an update to the server on your paddle's information,
         # where the ball is and the current score.
         # Feel free to change when the score is updated to suit your needs/requirements
-        
-        
+
+        # Create a dictionary with the relevant information
+        itemdata = {
+            "player_paddle": playerPaddleObj.__dict__,
+            "ball": ball.__dict__,
+            "score": (lScore, rScore),
+            "sync": sync
+        }
+
+        # Send the string to the server
+        client.send(pickle.dumps(itemdata))
+
         # =========================================================================================
 
         # Update the player paddle and opponent paddle's location on the screen
@@ -154,7 +165,18 @@ def playGame(screenWidth:int, screenHeight:int, playerPaddle:str, client:socket.
         # =========================================================================================
         # Send your server update here at the end of the game loop to sync your game with your
         # opponent's game
+        data = pickle.loads(client.recv(4096)) # getting data from server
 
+        # comparing sync values to determine who is ahead of who, then updating with that data
+        if sync < data["sync"]:
+            sync = data["sync"]
+            for key in data["ball"]:
+                setattr(ball, key, data["ball"][key])
+            lScore, rScore = data["score"]
+        for key in data["player_paddle"]:
+            setattr(opponentPaddleObj, key, data["player_paddle"][key])
+
+        
         # =========================================================================================
 
 
@@ -175,9 +197,12 @@ def joinServer(ip:str, port:str, errorLabel:tk.Label, app:tk.Tk) -> None:
     # Create a socket and connect to the server
     # You don't have to use SOCK_STREAM, use what you think is best
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    client.connect((ip, int(port)))
 
     # Get the required information from your server (screen width, height & player paddle, "left or "right)
-
+    screenWidth = 640
+    screenHeight = 480
+    playerPaddle = pickle.loads(client.recv(2048))
 
     # If you have messages you'd like to show the user use the errorLabel widget like so
     errorLabel.config(text=f"Some update text. You input: IP: {ip}, Port: {port}")
@@ -185,9 +210,9 @@ def joinServer(ip:str, port:str, errorLabel:tk.Label, app:tk.Tk) -> None:
     errorLabel.update()     
 
     # Close this window and start the game with the info passed to you from the server
-    #app.withdraw()     # Hides the window (we'll kill it later)
-    #playGame(screenWidth, screenHeight, ("left"|"right"), client)  # User will be either left or right paddle
-    #app.quit()         # Kills the window
+    app.withdraw()     # Hides the window (we'll kill it later)
+    playGame(screenWidth, screenHeight, playerPaddle, client)  # User will be either left or right paddle
+    app.quit()         # Kills the window
 
 
 # This displays the opening screen, you don't need to edit this (but may if you like)
