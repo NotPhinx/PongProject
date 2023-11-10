@@ -8,7 +8,7 @@
 
 import socket
 import threading
-import json
+import pickle
 
 # Use this file to write your server logic
 # You will need to support at least two clients
@@ -24,7 +24,7 @@ import json
 # need to decide if threads should be created and joined before or after getting info from client
 
 # add ip address of local machine that will host server
-server = ""
+server = "192.168.0.112"
 port = 5555
 
 # socket for connection to server
@@ -53,26 +53,33 @@ player1_objData = {
 }
 
 def threadClient(conn:socket.socket, player:int) -> None:
+    if player == 0:
+        conn.send(pickle.dumps("left"))
+    elif player == 1:
+        conn.send(pickle.dumps("right"))
     reply = ""
     while True:
         try:
-            data = conn.recv(2048).decode("utf-8")
-            data = json.loads(data)
+            print("here1")
+            data = pickle.loads(conn.recv(4096))
+            print(data)
 
             if not data:
                 print("Disconnected")
                 break
             else:
-                if player == 0 and player1_objData["sync"] > 0:
+                if player == 0:
                     for key in data:
                         player0_objData[key] = data[key]
-                    reply = str(player1_objData)
-                elif player == 1 and player0_objData["sync"] > 0:
+                    reply = player1_objData
+                elif player == 1:
                     for key in data:
                         player1_objData[key] = data[key]
-                    reply = str(player0_objData)
+                    reply = player0_objData
 
-            conn.send(str.encode(reply))
+            print("here2")
+            print(reply)
+            conn.send(pickle.dumps(reply))
         except:
             break
 
@@ -85,4 +92,5 @@ while True:
     print("Connected to:", addr)
 
     thread = threading.Thread(target=threadClient, args=(conn, currentPlayer))
+    thread.start()
     currentPlayer += 1
