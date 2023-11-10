@@ -10,7 +10,6 @@ import pygame
 import tkinter as tk
 import sys
 import socket
-import json
 
 from assets.code.helperCode import *
 
@@ -83,21 +82,8 @@ def playGame(screenWidth:int, screenHeight:int, playerPaddle:str, client:socket.
         # Your code here to send an update to the server on your paddle's information,
         # where the ball is and the current score.
         # Feel free to change when the score is updated to suit your needs/requirements
-
-        # Create a dictionary with the relevant information
-        itemdata = {
-            "player_paddle": playerPaddleObj,
-            "ball": ball,
-            "score": (lScore, rScore),
-            "sync": sync
-        }
-
-        # Convert the dictionary to a string
-        objectdata = str(itemdata)
-
-        # Send the string to the server
-        client.send(objectdata.encode())
-
+        
+        
         # =========================================================================================
 
         # Update the player paddle and opponent paddle's location on the screen
@@ -168,16 +154,7 @@ def playGame(screenWidth:int, screenHeight:int, playerPaddle:str, client:socket.
         # =========================================================================================
         # Send your server update here at the end of the game loop to sync your game with your
         # opponent's game
-        data = client.recv(2048).decode('utf8')
-        data = json.load(data)
-        if sync < data["sync"]:
-            sync = data["sync"]
-            ball = data["ball"]
-            lScore = data["lScore"]
-            rScore = data["rScore"]
-        opponentPaddleObj = data["opponentPaddleObject"]
 
-        
         # =========================================================================================
 
 
@@ -200,9 +177,7 @@ def joinServer(ip:str, port:str, errorLabel:tk.Label, app:tk.Tk) -> None:
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     # Get the required information from your server (screen width, height & player paddle, "left or "right)
-    screenWidth = 640
-    screenHeight = 480
-    playerPaddle = "left"
+
 
     # If you have messages you'd like to show the user use the errorLabel widget like so
     errorLabel.config(text=f"Some update text. You input: IP: {ip}, Port: {port}")
