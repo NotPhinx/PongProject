@@ -165,14 +165,14 @@ def playGame(screenWidth:int, screenHeight:int, playerPaddle:str, client:socket.
         # =========================================================================================
         # Send your server update here at the end of the game loop to sync your game with your
         # opponent's game
-        data = pickle.loads(client.recv(4096))
-        print(data)
+        data = pickle.loads(client.recv(4096)) # getting data from server
 
+        # comparing sync values to determine who is ahead of who, then updating with that data
         if sync < data["sync"]:
             sync = data["sync"]
-            ball = data["ball"]
-            lScore = data["lScore"]
-            rScore = data["rScore"]
+            for key in data["ball"]:
+                setattr(ball, key, data["ball"][key])
+            lScore, rScore = data["score"]
         for key in data["player_paddle"]:
             setattr(opponentPaddleObj, key, data["player_paddle"][key])
 
