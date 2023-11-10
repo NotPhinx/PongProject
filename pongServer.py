@@ -30,15 +30,18 @@ port = 5555
 # socket for connection to server
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-
+# catching socket binding errors
 try: 
     sock.bind((server, port))
 except socket.error as e:
     str(e)
 
+# socket listens for 2 connections before refusing further ones
 sock.listen(2)
 print("Server launched successfully, waiting for connection")
 
+
+# initializing object data for both players
 player0_objData = {
     "player_paddle": "",
     "ball": "",
@@ -52,17 +55,20 @@ player1_objData = {
     "sync": 0
 }
 
+# thread target function that handles the majority of the continuous communication between server and each client
+# it passes in a connection and player number to differentiate between clients
 def threadClient(conn:socket.socket, player:int) -> None:
+    # first player to connect will be the left paddle and second will be right
     if player == 0:
         conn.send(pickle.dumps("left"))
     elif player == 1:
         conn.send(pickle.dumps("right"))
     reply = ""
+
+    # main loop for sending data between clients and update object data on server
     while True:
         try:
-            print("here1")
             data = pickle.loads(conn.recv(4096))
-            print(data)
 
             if not data:
                 print("Disconnected")
@@ -77,8 +83,6 @@ def threadClient(conn:socket.socket, player:int) -> None:
                         player1_objData[key] = data[key]
                     reply = player0_objData
 
-            print("here2")
-            print(reply)
             conn.send(pickle.dumps(reply))
         except:
             break
@@ -86,6 +90,7 @@ def threadClient(conn:socket.socket, player:int) -> None:
     print("Loss connection")
     conn.close()
 
+# main loop for accepting new connections and passing them into the thread function
 currentPlayer = 0
 while True:
     conn, addr = sock.accept()
@@ -94,3 +99,4 @@ while True:
     thread = threading.Thread(target=threadClient, args=(conn, currentPlayer))
     thread.start()
     currentPlayer += 1
+    
