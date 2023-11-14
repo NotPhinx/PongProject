@@ -13,6 +13,9 @@ Versioning
 Github Link: 
 https://github.com/NotPhinx/PongProject
 
+Report Link:
+https://docs.google.com/document/d/19_ldL_nmP29nleiZ-YYSQyoq11BeDDCffjT2Hk_minU/edit?usp=sharing 
+
 General Info
 ============
 This code repository is for UKY's CS 371 Pong Project. It includes a server and client file
@@ -20,7 +23,7 @@ as well as some helper functions in auxiliary files (found in assets). The serve
 supports the connection of two clients and the communication between them. It stores the data
 necessary and sends it to the respective client. The client is where the game is actually run, 
 using updates from the server to determine which client is most up-to-date. It uses a TCP 
-connection which allows for reliablility between the two clients, but does create some delay
+connection which allows for reliability between the two clients, but does create some delay
 on traversal of the ball. 
 
 Install Instructions
