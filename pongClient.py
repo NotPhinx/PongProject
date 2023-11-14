@@ -1,10 +1,13 @@
-# =================================================================================================
-# Contributing Authors:	    <Anyone who touched the code>
-# Email Addresses:          <Your uky.edu email addresses>
-# Date:                     <The date the file was last edited>
-# Purpose:                  <How this file contributes to the project>
-# Misc:                     <Not Required.  Anything else you might want to include>
-# =================================================================================================
+# =================================================================================================================
+# Contributing Authors:	    Braden Howell
+#                           Ethan Binkley
+# Email Addresses:          brho231@uky.edu
+#                           rebi227@uky.edu
+# Date:                     11/13/2023
+# Purpose:                  This file contains the client side of Python's Pong. It will run the 
+#                           game on the local machine and send updates to the server. The server
+#                           responds with the other clients info and the most up-to-date information is used.
+# =================================================================================================================
 
 import pygame
 import tkinter as tk

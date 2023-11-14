@@ -1,9 +1,9 @@
 # =================================================================================================
-# Contributing Authors:	    <Anyone who touched the code>
-# Email Addresses:          <Your uky.edu email addresses>
-# Date:                     <The date the file was last edited>
-# Purpose:                  <How this file contributes to the project>
-# Misc:                     <Not Required.  Anything else you might want to include>
+# Contributing Authors:	    Braden Howell
+# Email Addresses:          brho231@uky.edu
+# Date:                     11/13/2023
+# Purpose:                  This file contains the code to run the server for Python's Pong. It 
+#                           currently supports 2 clients and the communication between them. 
 # =================================================================================================
 
 import socket
@@ -34,6 +34,7 @@ sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 try: 
     sock.bind((server, port))
 except socket.error as e:
+    print("here")
     str(e)
 
 # socket listens for 2 connections before refusing further ones
