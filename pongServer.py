@@ -38,6 +38,7 @@ except socket.error as e:
     str(e)
 
 # socket listens for 2 connections before refusing further ones
+connectedPlayers = 0
 sock.listen(2)
 print("Server launched successfully, waiting for connection")
 
@@ -68,25 +69,26 @@ def threadClient(conn:socket.socket, player:int) -> None:
 
     # main loop for sending data between clients and update object data on server
     while True:
-        try:
-            data = pickle.loads(conn.recv(4096))
+        if connectedPlayers == 2:
+            try:
+                data = pickle.loads(conn.recv(4096))
 
-            if not data:
-                print("Disconnected")
+                if not data:
+                    print("Disconnected")
+                    break
+                else:
+                    if player == 0:
+                        for key in data:
+                            player0_objData[key] = data[key]
+                        reply = player1_objData
+                    elif player == 1:
+                        for key in data:
+                            player1_objData[key] = data[key]
+                        reply = player0_objData
+
+                conn.send(pickle.dumps(reply))
+            except:
                 break
-            else:
-                if player == 0:
-                    for key in data:
-                        player0_objData[key] = data[key]
-                    reply = player1_objData
-                elif player == 1:
-                    for key in data:
-                        player1_objData[key] = data[key]
-                    reply = player0_objData
-
-            conn.send(pickle.dumps(reply))
-        except:
-            break
 
     print("Loss connection")
     conn.close()
@@ -99,5 +101,6 @@ while True:
 
     thread = threading.Thread(target=threadClient, args=(conn, currentPlayer))
     thread.start()
+    connectedPlayers += 1
     currentPlayer += 1
     
