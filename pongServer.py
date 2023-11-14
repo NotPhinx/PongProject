@@ -1,6 +1,10 @@
 # =================================================================================================
 # Contributing Authors:	    Braden Howell
+#                           Ethan Binkley
+# 
 # Email Addresses:          brho231@uky.edu
+#                           rebi227@.uky.edu
+#      
 # Date:                     11/13/2023
 # Purpose:                  This file contains the code to run the server for Python's Pong. It 
 #                           currently supports 2 clients and the communication between them. 
@@ -38,23 +42,31 @@ except socket.error as e:
     str(e)
 
 # socket listens for 2 connections before refusing further ones
-sock.listen(2)
+sock.listen()
 print("Server launched successfully, waiting for connection")
 
 
 # initializing object data for both players
-player0_objData = {
+players_objData = []
+
+#function to reset the game for both players
+def reset_game():
+    global player0_objData, player1_objData
+
+    # Reset player0_objData
+    player0_objData = {
+        "player_paddle": "",
+        "ball": "",
+        "score": (0, 0),
+        "sync": 0
+    }
+    # Reset player1_objData
+    player1_objData = {
     "player_paddle": "",
     "ball": "",
     "score": (0, 0),
     "sync": 0
-}
-player1_objData = {
-    "player_paddle": "",
-    "ball": "",
-    "score": (0, 0),
-    "sync": 0
-}
+    }
 
 # thread target function that handles the majority of the continuous communication between server and each client
 # it passes in a connection and player number to differentiate between clients
@@ -75,14 +87,22 @@ def threadClient(conn:socket.socket, player:int) -> None:
                 print("Disconnected")
                 break
             else:
-                if player == 0:
-                    for key in data:
-                        player0_objData[key] = data[key]
-                    reply = player1_objData
-                elif player == 1:
-                    for key in data:
-                        player1_objData[key] = data[key]
-                    reply = player0_objData
+                if data == b'PLAY_AGAIN':
+                    #reset game state
+                    reset_game()
+                    #send "GAME_RESET" to both clients'
+                    for connection in connections:
+                        connection.send(pickle.dumps("GAME_RESET"))
+                else:
+                    
+                    if player == 0:
+                        for key in data:
+                            player0_objData[key] = data[key]
+                        reply = player1_objData
+                    elif player == 1:
+                        for key in data:
+                            player1_objData[key] = data[key]
+                        reply = player0_objData
 
             conn.send(pickle.dumps(reply))
         except:
@@ -92,10 +112,20 @@ def threadClient(conn:socket.socket, player:int) -> None:
     conn.close()
 
 # main loop for accepting new connections and passing them into the thread function
+connections = []
 currentPlayer = 0
 while True:
     conn, addr = sock.accept()
     print("Connected to:", addr)
+
+    players_objData.append({
+        "player_paddle": "",
+        "ball": "",
+        "score": (0, 0),
+        "sync": 0
+    })
+
+    connections.append(conn)
 
     thread = threading.Thread(target=threadClient, args=(conn, currentPlayer))
     thread.start()

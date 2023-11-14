@@ -16,6 +16,26 @@ import socket
 import pickle
 
 from assets.code.helperCode import *
+#This is the function to play again
+def display_play_again_option(screenWidth:int, screenHeight:int, screen:pygame.Surface) -> bool:
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_y:
+                    return True
+                if event.key == pygame.K_n:
+                    return False
+
+        # Display "Play Again? (Y/N)" text
+        font = pygame.font.Font(None, 36)
+        text = font.render("Play Again? (Y/N)", True, (255, 255, 255))
+        text_rect = text.get_rect(center=(screenWidth/2, screenHeight/2))
+        screen.blit(text, text_rect)
+
+        pygame.display.flip()
 
 # This is the main game loop.  For the most part, you will not need to modify this.  The sections
 # where you should add to the code are marked.  Feel free to change any part of this project
@@ -116,6 +136,11 @@ def playGame(screenWidth:int, screenHeight:int, playerPaddle:str, client:socket.
             textRect = textSurface.get_rect()
             textRect.center = ((screenWidth/2), screenHeight/2)
             screen.blit(textSurface, textRect)
+
+            #display the play again option and wait for players to input
+            play_again = display_play_again_option()
+            if play_again:
+                client.sendall(b'PLAY_AGAIN')
         else:
 
             # ==== Ball Logic =====================================================================
