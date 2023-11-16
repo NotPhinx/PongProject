@@ -1,7 +1,9 @@
 # =================================================================================================
 # Contributing Authors:	    Braden Howell
+#                           Jaden Vaught
 # Email Addresses:          brho231@uky.edu
-# Date:                     11/13/2023
+#                           jva231@uky.edu
+# Date:                     11/16/2023
 # Purpose:                  This file contains the code to run the server for Python's Pong. It 
 #                           currently supports 2 clients and the communication between them. 
 # =================================================================================================
@@ -24,7 +26,7 @@ import pickle
 # need to decide if threads should be created and joined before or after getting info from client
 
 # add ip address of local machine that will host server
-server = "192.168.0.112"
+server = "192.168.68.115"
 port = 5555
 
 # socket for connection to server
