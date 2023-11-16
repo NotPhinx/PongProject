@@ -17,7 +17,9 @@ import pickle
 
 from assets.code.helperCode import *
 #This is the function to play again
-def display_play_again_option(screenWidth:int, screenHeight:int, screen:pygame.Surface) -> bool:
+def display_play_again_option(screenWidth: int, screenHeight: int, screen: pygame.Surface) -> bool:
+    play_again = False  # Default value, update based on your logic
+
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -25,14 +27,20 @@ def display_play_again_option(screenWidth:int, screenHeight:int, screen:pygame.S
                 sys.exit()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_y:
+                    # Display a message indicating that the player chose to play again
+
+                    print("Player wants to play again.")
                     return True
                 if event.key == pygame.K_n:
-                    return False
+                    connected_clients -= 2
+                    print("Player has left")
+                    pygame.quit()
+                    sys.exit()
 
         # Display "Play Again? (Y/N)" text
         font = pygame.font.Font(None, 36)
         text = font.render("Play Again? (Y/N)", True, (255, 255, 255))
-        text_rect = text.get_rect(center=(screenWidth/2, screenHeight/2))
+        text_rect = text.get_rect(center=(screenWidth / 2, screenHeight / 2))
         screen.blit(text, text_rect)
 
         pygame.display.flip()
@@ -107,12 +115,15 @@ def playGame(screenWidth:int, screenHeight:int, playerPaddle:str, client:socket.
         # where the ball is and the current score.
         # Feel free to change when the score is updated to suit your needs/requirements
 
+        play_again = False  # Default value, update based on your logic
+
         # Create a dictionary with the relevant information
         itemdata = {
             "player_paddle": playerPaddleObj.__dict__,
             "ball": ball.__dict__,
             "score": (lScore, rScore),
-            "sync": sync
+            "sync": sync,
+            "play_again": play_again
         }
 
         # Send the string to the server
@@ -132,15 +143,30 @@ def playGame(screenWidth:int, screenHeight:int, playerPaddle:str, client:socket.
         # If the game is over, display the win message
         if lScore > 4 or rScore > 4:
             winText = "Player 1 Wins! " if lScore > 4 else "Player 2 Wins! "
-            textSurface = winFont.render(winText, False, WHITE, (0,0,0))
+            textSurface = winFont.render(winText, False, WHITE, (0, 0, 0))
             textRect = textSurface.get_rect()
-            textRect.center = ((screenWidth/2), screenHeight/2)
+            textRect.center = ((screenWidth / 2), screenHeight / 4)
             screen.blit(textSurface, textRect)
 
-            #display the play again option and wait for players to input
-            play_again = display_play_again_option()
-            if play_again:
-                client.sendall(b'PLAY_AGAIN')
+            # Display the play again option and wait for players to input
+            play_again = display_play_again_option(screenWidth, screenHeight, screen)
+
+            # Send the player's decision to the server
+            client.send(pickle.dumps({"play_again": play_again}))
+
+            # Wait for the opponent's decision
+            opponent_decision = pickle.loads(client.recv(4096))["play_again"]
+
+            # Check if both players want to play again
+            if play_again and opponent_decision:
+                # Send "GAME_RESET" to both clients
+                for connection in connections:
+                    connection.send(pickle.dumps({"signal": "GAME_RESET"}))
+                # Reset play_again status for the next round
+                playerPaddleObj.play_again = False
+                opponentPaddleObj.play_again = False
+                # play game
+                playGame(screenWidth, screenHeight, playerPaddle, client)
         else:
 
             # ==== Ball Logic =====================================================================
@@ -230,17 +256,22 @@ def joinServer(ip:str, port:str, errorLabel:tk.Label, app:tk.Tk) -> None:
     # Get the required information from your server (screen width, height & player paddle, "left or "right)
     screenWidth = 640
     screenHeight = 480
-    playerPaddle = pickle.loads(client.recv(2048))
+    data_received = client.recv(2048)
+    if not data_received:
+        # Handle the case where no data is received
+        print("No data received from the server.")
+    else:
+        playerPaddle = pickle.loads(data_received)
 
-    # If you have messages you'd like to show the user use the errorLabel widget like so
-    errorLabel.config(text=f"Some update text. You input: IP: {ip}, Port: {port}")
-    # You may or may not need to call this, depending on how many times you update the label
-    errorLabel.update()     
+        # If you have messages you'd like to show the user use the errorLabel widget like so
+        errorLabel.config(text=f"Some update text. You input: IP: {ip}, Port: {port}")
+        # You may or may not need to call this, depending on how many times you update the label
+        errorLabel.update()     
 
-    # Close this window and start the game with the info passed to you from the server
-    app.withdraw()     # Hides the window (we'll kill it later)
-    playGame(screenWidth, screenHeight, playerPaddle, client)  # User will be either left or right paddle
-    app.quit()         # Kills the window
+        # Close this window and start the game with the info passed to you from the server
+        app.withdraw()     # Hides the window (we'll kill it later)
+        playGame(screenWidth, screenHeight, playerPaddle, client)  # User will be either left or right paddle
+        app.quit()         # Kills the window
 
 
 # This displays the opening screen, you don't need to edit this (but may if you like)

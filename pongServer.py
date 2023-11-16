@@ -33,7 +33,7 @@ leaderboard = {}
 # need to decide if threads should be created and joined before or after getting info from client
 
 # add ip address of local machine that will host server
-server = "192.168.0.112"
+server = "192.168.68.115"
 port = 5555
 
 # socket for connection to server
@@ -50,9 +50,25 @@ except socket.error as e:
 sock.listen()
 print("Server launched successfully, waiting for connection")
 
+players_objData = []  # Declare players_objData outside the loop
+
 
 # initializing object data for both players
-players_objData = []
+player0_objData = {
+        "player_paddle": "",
+        "ball": "",
+        "score": (0, 0),
+        "sync": 0,
+        "play_again": False
+    }
+
+player1_objData = {
+    "player_paddle": "",
+    "ball": "",
+    "score": (0, 0),
+    "sync": 0,
+    "play_again": False
+    }
 
 #function to reset the game for both players
 def reset_game():
@@ -63,16 +79,19 @@ def reset_game():
         "player_paddle": "",
         "ball": "",
         "score": (0, 0),
-        "sync": 0
+        "sync": 0,
+        "play_again": False
     }
     # Reset player1_objData
     player1_objData = {
     "player_paddle": "",
     "ball": "",
     "score": (0, 0),
-    "sync": 0
+    "sync": 0,
+    "play_again": False
     }
 
+    
 # thread target function that handles the majority of the continuous communication between server and each client
 # it passes in a connection and player number to differentiate between clients
 def threadClient(conn:socket.socket, player:int) -> None:
@@ -86,32 +105,44 @@ def threadClient(conn:socket.socket, player:int) -> None:
     # main loop for sending data between clients and update object data on server
     while True:
         try:
-            data = pickle.loads(conn.recv(4096))
-
-            if not data:
-                print("Disconnected")
-                break
-            else:
-                if data == b'PLAY_AGAIN':
-                    #update the leaderboard
-                    leaderboard[addr] = leaderboard.get(addr, 0) + 1
-                    #reset game state
-                    reset_game()
-                    #send "GAME_RESET" to both clients'
-                    for connection in connections:
-                        connection.send(pickle.dumps("GAME_RESET"))
+            if connected_clients >= 2:
+                data = pickle.loads(conn.recv(4096))
+                if not data:
+                    print("Disconnected")
+                    break
                 else:
-                    
-                    if player == 0:
-                        for key in data:
-                            player0_objData[key] = data[key]
-                        reply = player1_objData
-                    elif player == 1:
-                        for key in data:
-                            player1_objData[key] = data[key]
-                        reply = player0_objData
+                    if data == b'PLAY_AGAIN':
+                        # Update play_again status for the current player
+                        if player == 0:
+                            player0_objData["play_again"] = True
+                        elif player == 1:
+                            player1_objData["play_again"] = True
 
-            conn.send(pickle.dumps(reply))
+                        # Check if both players want to play again
+                        if player0_objData["play_again"] and player1_objData["play_again"]:
+                            # Restart the game
+                            reset_game()
+                            # Send "GAME_RESET" to both clients
+                            for connection in connections:
+                                connection.send(pickle.dumps({"signal": "GAME_RESET"}))
+
+                            for connection in connections:
+                                connection.send(pickle.dumps({"signal": "PLAY_GAME_AGAIN"}))
+                            # Reset play_again status for the next round
+                            player0_objData["play_again"] = False
+                            player1_objData["play_again"] = False
+                    else:
+                        
+                        if player == 0:
+                            for key in data:
+                                player0_objData[key] = data[key]
+                            reply = player1_objData
+                        elif player == 1:
+                            for key in data:
+                                player1_objData[key] = data[key]
+                            reply = player0_objData
+
+                conn.send(pickle.dumps(reply))
         except:
             break
 
@@ -125,6 +156,9 @@ def get_leaderboard():
 # main loop for accepting new connections and passing them into the thread function
 connections = []
 currentPlayer = 0
+# Counter to track the number of connected clients
+connected_clients = 0
+
 while True:
     conn, addr = sock.accept()
     print("Connected to:", addr)
@@ -133,10 +167,13 @@ while True:
         "player_paddle": "",
         "ball": "",
         "score": (0, 0),
-        "sync": 0
+        "sync": 0,
+        "play_again": False
+
     })
 
     connections.append(conn)
+    connected_clients += 1
 
     thread = threading.Thread(target=threadClient, args=(conn, currentPlayer))
     thread.start()
