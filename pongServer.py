@@ -13,6 +13,11 @@
 import socket
 import threading
 import pickle
+from flask import Flask, jsonify
+app = Flask(__name__)
+
+#initialize leaderboard
+leaderboard = {}
 
 # Use this file to write your server logic
 # You will need to support at least two clients
@@ -88,6 +93,8 @@ def threadClient(conn:socket.socket, player:int) -> None:
                 break
             else:
                 if data == b'PLAY_AGAIN':
+                    #update the leaderboard
+                    leaderboard[addr] = leaderboard.get(addr, 0) + 1
                     #reset game state
                     reset_game()
                     #send "GAME_RESET" to both clients'
@@ -110,6 +117,10 @@ def threadClient(conn:socket.socket, player:int) -> None:
 
     print("Loss connection")
     conn.close()
+
+@app.route('/leaderboard')
+def get_leaderboard():
+    return jsonify(leaderboard)
 
 # main loop for accepting new connections and passing them into the thread function
 connections = []

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaderboard</title>
+</head>
+<body>
+    <h1>Leaderboard</h1>
+    <table id="leaderboard">
+        <thead>
+            <tr>
+                <th>Player</th>
+                <th>Wins</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+    <script>
+        function updateLeaderboard() {
+            fetch('/leaderboard')
+                .then(response => response.json())
+                .then(data => {
+                    // Update the HTML with the new leaderboard data
+                    var leaderboard = document.getElementById('leaderboard');
+                    leaderboard.innerHTML = '';
+                    for (var player in data) {
+                        var row = document.createElement('tr');
+                        var nameCell = document.createElement('td');
+                        var winsCell = document.createElement('td');
+                        nameCell.textContent = player;
+                        winsCell.textContent = data[player];
+                        row.appendChild(nameCell);
+                        row.appendChild(winsCell);
+                        leaderboard.appendChild(row);
+                    }
+                });
+        }
+
+// Update the leaderboard every 5 seconds
+setInterval(updateLeaderboard, 5000);
+
+        // Call the updateLeaderboard function initially and every 5 seconds
+        updateLeaderboard();
+        setInterval(updateLeaderboard, 5000);
+    </script>
+</body>
+</html>
