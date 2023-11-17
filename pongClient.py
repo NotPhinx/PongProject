@@ -1,13 +1,10 @@
-# =================================================================================================================
-# Contributing Authors:	    Braden Howell
-#                           Ethan Binkley
-# Email Addresses:          brho231@uky.edu
-#                           rebi227@uky.edu
-# Date:                     11/13/2023
-# Purpose:                  This file contains the client side of Python's Pong. It will run the 
-#                           game on the local machine and send updates to the server. The server
-#                           responds with the other clients info and the most up-to-date information is used.
-# =================================================================================================================
+# =================================================================================================
+# Contributing Authors:	    <Anyone who touched the code>
+# Email Addresses:          <Your uky.edu email addresses>
+# Date:                     <The date the file was last edited>
+# Purpose:                  <How this file contributes to the project>
+# Misc:                     <Not Required.  Anything else you might want to include>
+# =================================================================================================
 
 import pygame
 import tkinter as tk
@@ -62,6 +59,7 @@ def playGame(screenWidth:int, screenHeight:int, playerPaddle:str, client:socket.
     rScore = 0
 
     sync = 0
+    counter = 0
 
     while True:
         # Wiping the screen
@@ -165,13 +163,16 @@ def playGame(screenWidth:int, screenHeight:int, playerPaddle:str, client:socket.
         # then you are ahead of them in time, if theirs is larger, they are ahead of you, and you need to
         # catch up (use their info)
         sync += 1
+        counter += 1
         # =========================================================================================
         # Send your server update here at the end of the game loop to sync your game with your
         # opponent's game
         data = pickle.loads(client.recv(4096)) # getting data from server
 
         # comparing sync values to determine who is ahead of who, then updating with that data
-        if sync < data["sync"]:
+        print(counter, sync)
+        if sync <= data["sync"]:
+            print("Updating sync from", sync, "to", data["sync"])
             sync = data["sync"]
             for key in data["ball"]:
                 setattr(ball, key, data["ball"][key])
