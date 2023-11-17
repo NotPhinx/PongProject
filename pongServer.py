@@ -73,9 +73,6 @@ player1_objData = {
 #function to reset the game for both players
 def reset_game():
     global player0_objData, player1_objData\
-    
-    for player_data in players_objData:
-        player_data['play_again'] = False   
 
     # Reset player0_objData
     player0_objData = {
@@ -119,8 +116,8 @@ def threadClient(conn:socket.socket, player:int) -> None:
 
                         #If all players want to play again, reset the game
                         if all(player_data['play_again'] for player_data in players_objData):
-                            reset_game()
                             for connection in connections:
+                                reset_game()
                                 connection.sendall(pickle.dumps('GAME_RESET'))
                     else:
                         

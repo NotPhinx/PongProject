@@ -33,4 +33,9 @@ Run the following line to install the required libraries for this project:
 Known Bugs
 ==========
 - The game is a few frames behind at times, but doesn't effect the gameplay.
+- WHen you quickly hit up and down to move the paddle padle will not move
+- game is won while unsynced will not resync
+- when game over only the second client to say yes will restart their game
+- if one client says yes to play again and the second one says no the lone client on the server will be stuck in a loop
+- once a client disconnect the server needs restarted
 
