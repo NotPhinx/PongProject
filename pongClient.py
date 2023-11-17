@@ -150,22 +150,11 @@ def playGame(screenWidth:int, screenHeight:int, playerPaddle:str, client:socket.
             # Display the play again option and wait for players to input
             play_again = display_play_again_option(screenWidth, screenHeight, screen)
 
-            # Send the player's decision to the server
-            client.send(pickle.dumps({"play_again": play_again}))
-
-            # Wait for the opponent's decision
-            opponent_decision = pickle.loads(client.recv(4096))["play_again"]
-
-            # Check if both players want to play again
-            if play_again and opponent_decision:
-                # Send "GAME_RESET" to both clients
-                for connection in connections:
-                    connection.send(pickle.dumps({"signal": "GAME_RESET"}))
-                # Reset play_again status for the next round
-                playerPaddleObj.play_again = False
-                opponentPaddleObj.play_again = False
-                # play game
-                playGame(screenWidth, screenHeight, playerPaddle, client)
+            if play_again:
+                client.sendall(pickle.dumps('PLAY_AGAIN'))
+            else:
+                break
+                            
         else:
 
             # ==== Ball Logic =====================================================================
@@ -219,6 +208,16 @@ def playGame(screenWidth:int, screenHeight:int, playerPaddle:str, client:socket.
         # Send your server update here at the end of the game loop to sync your game with your
         # opponent's game
         data = pickle.loads(client.recv(4096)) # getting data from server
+
+        #if the server sends the "GAME_RESET" message, reset the game
+        if data == 'GAME_RESET':
+            lscore = 0
+            rscore = 0
+            ball.reset()
+            playerPaddleObj.reset()
+            opponentPaddleObj.reset()
+            continue
+            
 
         # comparing sync values to determine who is ahead of who, then updating with that data
         if sync < data["sync"]:
