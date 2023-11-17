@@ -26,7 +26,7 @@ import pickle
 # need to decide if threads should be created and joined before or after getting info from client
 
 # add ip address of local machine that will host server
-server = "192.168.68.115"
+server = "192.168.0.112"
 port = 5555
 
 # socket for connection to server
@@ -36,8 +36,9 @@ sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 try: 
     sock.bind((server, port))
 except socket.error as e:
-    print("here")
-    str(e)
+    print("Error:", str(e))
+    print("Check server IP and port number")
+    exit()
 
 # socket listens for 2 connections before refusing further ones
 connectedPlayers = 0
