@@ -30,9 +30,8 @@ def display_play_again_option(screenWidth: int, screenHeight: int, screen: pygam
                     # Display a message indicating that the player chose to play again
 
                     print("Player wants to play again.")
-                    return True
+                    #client.send(pickle.dumps('PLAY_AGAIN'))
                 if event.key == pygame.K_n:
-                    connected_clients -= 2
                     print("Player has left")
                     pygame.quit()
                     sys.exit()
