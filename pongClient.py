@@ -59,7 +59,6 @@ def playGame(screenWidth:int, screenHeight:int, playerPaddle:str, client:socket.
     rScore = 0
 
     sync = 0
-    counter = 0
 
     while True:
         # Wiping the screen
@@ -170,9 +169,7 @@ def playGame(screenWidth:int, screenHeight:int, playerPaddle:str, client:socket.
         data = pickle.loads(client.recv(4096)) # getting data from server
 
         # comparing sync values to determine who is ahead of who, then updating with that data
-        print(counter, sync)
         if sync <= data["sync"]:
-            print("Updating sync from", sync, "to", data["sync"])
             sync = data["sync"]
             for key in data["ball"]:
                 setattr(ball, key, data["ball"][key])
