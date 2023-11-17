@@ -17,9 +17,7 @@ import pickle
 
 from assets.code.helperCode import *
 #This is the function to play again
-def display_play_again_option(screenWidth: int, screenHeight: int, screen: pygame.Surface, client: socket.socket) -> bool:
-    play_again = False  # Default value, update based on your logic
-
+def display_play_again_option(screenWidth: int, screenHeight: int, paddleHeight: int, screen: pygame.Surface, client: socket.socket) -> bool:
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -58,7 +56,7 @@ def display_play_again_option(screenWidth: int, screenHeight: int, screen: pygam
 # where you should add to the code are marked.  Feel free to change any part of this project
 # to suit your needs.
 def playGame(screenWidth:int, screenHeight:int, playerPaddle:str, client:socket.socket) -> None:
-    
+    print("game is starting")
     # Pygame inits
     pygame.mixer.pre_init(44100, -16, 2, 2048)
     pygame.init()
@@ -124,17 +122,15 @@ def playGame(screenWidth:int, screenHeight:int, playerPaddle:str, client:socket.
         # where the ball is and the current score.
         # Feel free to change when the score is updated to suit your needs/requirements
 
-        play_again = False  # Default value, update based on your logic
-
         # Create a dictionary with the relevant information
         itemdata = {
             "player_paddle": playerPaddleObj.__dict__,
             "ball": ball.__dict__,
             "score": (lScore, rScore),
             "sync": sync,
-            "play_again": play_again
         }
 
+        print(itemdata)
         # Send the string to the server
         client.send(pickle.dumps(itemdata))
 
@@ -158,12 +154,9 @@ def playGame(screenWidth:int, screenHeight:int, playerPaddle:str, client:socket.
             screen.blit(textSurface, textRect)
 
             # Display the play again option and wait for players to input
-            play_again = display_play_again_option(screenWidth, screenHeight, screen, client)
-
-            # Reset the scores when the game is over
-            lScore = 0
-            rScore = 0
-                
+            display_play_again_option(screenWidth, screenHeight, paddleHeight, screen, client)
+            sync = 0
+            return playGame(screenWidth, screenHeight, "", client)
                             
         else:
 
@@ -227,8 +220,6 @@ def playGame(screenWidth:int, screenHeight:int, playerPaddle:str, client:socket.
             lScore, rScore = data["score"]
         for key in data["player_paddle"]:
             setattr(opponentPaddleObj, key, data["player_paddle"][key])
-
-        
         # =========================================================================================
 
 

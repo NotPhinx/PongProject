@@ -52,24 +52,6 @@ print("Server launched successfully, waiting for connection")
 
 players_objData = []  # Declare players_objData outside the loop
 
-
-# initializing object data for both players
-player0_objData = {
-        "player_paddle": "",
-        "ball": "",
-        "score": (0, 0),
-        "sync": 0,
-        "play_again": False
-    }
-
-player1_objData = {
-    "player_paddle": "",
-    "ball": "",
-    "score": (0, 0),
-    "sync": 0,
-    "play_again": False
-    }
-
 #function to reset the game for both players
 def reset_game():
     global player0_objData, player1_objData\
@@ -91,7 +73,9 @@ def reset_game():
     "play_again": False
     }
 
-    
+# initializing object data for both players
+reset_game()
+
 # thread target function that handles the majority of the continuous communication between server and each client
 # it passes in a connection and player number to differentiate between clients
 def threadClient(conn:socket.socket, player:int) -> None:
@@ -107,6 +91,7 @@ def threadClient(conn:socket.socket, player:int) -> None:
         try:
             if connected_clients >= 2:
                 data = pickle.loads(conn.recv(4096))
+                print(data)
                 if not data:
                     print("Disconnected")
                     break
@@ -114,11 +99,11 @@ def threadClient(conn:socket.socket, player:int) -> None:
                     if data == 'PLAY_AGAIN':
                         players_objData[player]['play_again'] = True
 
-                        #If all players want to play again, reset the game
+                        #If all players want to play again, reset the game state and send to the clients to restart the game
                         if all(player_data['play_again'] for player_data in players_objData):
                             for connection in connections:
-                                reset_game()
                                 connection.sendall(pickle.dumps('GAME_RESET'))
+                                reset_game()
                     else:
                         
                         if player == 0:
