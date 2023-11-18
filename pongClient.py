@@ -1,9 +1,14 @@
 # =================================================================================================
-# Contributing Authors:	    <Anyone who touched the code>
-# Email Addresses:          <Your uky.edu email addresses>
-# Date:                     <The date the file was last edited>
-# Purpose:                  <How this file contributes to the project>
-# Misc:                     <Not Required.  Anything else you might want to include>
+# Contributing Authors:	    Braden Howell
+#                           Ethan Binkley
+#                           Jaden Vaught
+# Email Addresses:          brho231@uky.edu
+#                           rebi227@uky.edu
+#                           jva231@uky.edu
+# Date:                     11/17/2023
+# Purpose:                  This is the client code to run our 2-player pong game. The client will
+#                           simulate the pong game code and communicate with the server to sync with 
+#                           the other client for a smooth game experience. first to 5 wins.
 # =================================================================================================
 
 import pygame
