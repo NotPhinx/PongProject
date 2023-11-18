@@ -1,9 +1,11 @@
 # =================================================================================================
 # Contributing Authors:	    Braden Howell
+#                           Ethan Binkley
 #                           Jaden Vaught
 # Email Addresses:          brho231@uky.edu
+#                           rebi227@uky.edu
 #                           jva231@uky.edu
-# Date:                     11/16/2023
+# Date:                     11/17/2023
 # Purpose:                  This file contains the code to run the server for Python's Pong. It 
 #                           currently supports 2 clients and the communication between them. 
 # =================================================================================================
@@ -17,15 +19,15 @@ import pickle
 # You will need to keep track of where on the screen (x,y coordinates) each paddle is, the score 
 # for each player and where the ball is, and relay that to each client
 # I suggest you use the sync variable in pongClient.py to determine how out of sync your two
-# clients are and take actions to resync the game
+# Clients are and take actions to resync the game
 
-# initialize server and its information
-# connect to various hosts to specific port
-# begin threads to handle separate communication from server to each client
+# Initialize server and its information
+# Connect to various hosts to a specific port
+# begin threads to handle separate communication from the server to each client
 
 # need to decide if threads should be created and joined before or after getting info from client
 
-# add ip address of local machine that will host server
+# add IP address of the local machine that will host the server
 server = "192.168.0.112"
 port = 5555
 
