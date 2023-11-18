@@ -30,8 +30,14 @@ Install Instructions
 ====================
 
 Run the following line to install the required libraries for this project:
-
 `pip3 install -r requirements.txt`
+
+The best practice is to have 3 devices to play:
+Device 1: Will run the server code
+Device 2: Will run the client code and will connect to the server using the IPv4 of Device 1 
+    and port 5555
+Device 3: Will run the client code and will connect to the server using the IPv4 of Device 1
+    and port 5555
 
 Known Bugs
 ==========
